@@ -4,6 +4,24 @@ All notable changes to this skill are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-10-08
+
+Fix release, from scoring the prompt-1 agent eval runs against 0.1.0.
+
+### Changed
+
+- An unattended run commits nothing and creates no branch; the handover lists the files of the refactor
+  commit and the knowledge commit, in that order (`SKILL.md`, `adaptation.md`, `verification.md`).
+- A seam the host lacks stays absent: with no sitemap source the route is added to the pack's existing site
+  map, and with no transport `scripts/ask.mjs` is a stub that throws until wired; no routes module, endpoint
+  or environment variable is invented (`SKILL.md`, `pack-and-corpus.md`, `verification.md`).
+- The shipped tests a host copies are named: those whose seams it has, assertions unchanged, 2 of the 4
+  without a catalog; extra tests go beside them (`SKILL.md`, `verification.md`).
+- The host's search scorer stays as it is, and a canonical path is a role, not a file to create
+  (`pack-and-corpus.md`, `adaptation.md`).
+- The handover names the probes not run, the absent seams, the pack size before and after, the tests that
+  ran and the two commits' files (`SKILL.md`).
+
 ## [0.1.0] - 2026-10-08
 
 First release: a procedure for teaching a Next.js site's AI chat assistant a new page, program or catalog
