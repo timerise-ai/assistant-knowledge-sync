@@ -30,7 +30,9 @@ non-negotiables. Fill the seam table before editing anything; every other refere
 | Project docs line | `docs` | | the line in `CLAUDE.md` or `README.md` that lists what the assistant knows |
 
 Mark a seam the host does not have as absent; never invent a file to fill the column. A host with no probe
-script gets one, from [verification.md](verification.md).
+script gets one, and a host with no transport to the assistant gets the `ask` stub, both from
+[verification.md](verification.md). The canonical path names a role, not a file to create: a host whose data
+module is `data/partners.ts` uses that path, and never adds `data/program.ts` beside it.
 
 ## The knowledge interface
 
@@ -59,7 +61,8 @@ adjusted to the host's signature, never the host to the tests.
 | `siteMapLines`, `joinedRows` | the site map and the live index join | the host's pack builders |
 
 The authoring contract is not renamed: the five hard rules, the probe shape `{ name, question, expect,
-reject }`, and the order refactor commit first, knowledge commit second.
+reject }`, and the order refactor commit first, knowledge commit second. On an unattended run the operator
+makes the two commits from the handover's file lists; the agent commits nothing and creates no branch.
 
 ## Integration points
 

@@ -16,6 +16,12 @@ One test per new kind of retrieval and one per guardrail line. Query with words 
 calls follow the knowledge interface of [adaptation.md](adaptation.md); adjust them to the host's
 signatures, never the other way round.
 
+Copy the tests whose seams the host has, with their assertions unchanged. The first two need a catalog; a
+host without one copies the program and pack tests, 2 of the 4, and the handover says so. Tests of your own
+(existing retrieval, the prompt module) go in their own `describe` block or file beside these, never in place
+of them. The pack test expects the guardrail line from [pack-and-corpus.md](pack-and-corpus.md) word for word,
+which is the point: a reworded guardrail fails it.
+
 ```ts
 // lib/ai/knowledge.test.ts
 import { describe, expect, test } from "vitest";
@@ -48,7 +54,8 @@ describe("catalog and program", () => {
 
 The host's runner runs it: `bun test` takes the `vitest` import as its own, and a vitest host runs it as it
 is. A host with no runner gets vitest (`npm i -D vitest`, the package registry is not an external service),
-a `"test": "vitest run"` script, and this config so the `@/` alias resolves:
+a `"test": "vitest run"` script, and this config so the `@/` alias resolves (named `vitest.config.mts` when
+`package.json` has no `"type": "module"`, which silences Vite's CommonJS warning; the content is the same):
 
 ```ts
 // vitest.config.ts
@@ -101,6 +108,18 @@ new fact, one per guardrail. Keep them in the host's probe script next to the ea
 regression tests for the next model or prompt change. A host without one gets this script; `ask` is the
 host's, sending one question to the running assistant and resolving to the answer text.
 
+A host with no transport the script can reach (no chat route, no client) gets `ask` as a stub that throws, so
+a run before it is wired fails loudly instead of passing. Do not invent an endpoint, a request shape or an
+environment variable for it; the handover says the file must be wired.
+
+```js
+// scripts/ask.mjs
+/** Sends one question to the running assistant and resolves to the answer text. The host wires this. */
+export async function ask(question) {
+  throw new Error(`scripts/ask.mjs is not wired to the assistant yet; probe not run: ${question}`);
+}
+```
+
 ```js
 // scripts/probe.mjs
 import { ask } from "./ask.mjs";
@@ -151,12 +170,13 @@ A probe is never reported as passing on a run that did not happen.
 3. Print the pack; read the new sections.
 4. Dev server: render check (if refactored), then the full probe suite.
 5. Stop the dev server.
-6. Two commits: the refactor, then the knowledge change with tests and probes.
+6. Two commits: the refactor, then the knowledge change with tests and probes. On an unattended run, commit
+   nothing and create no branch: the handover lists the files of each commit, in that order.
 
 ## Checklist
 
 - [ ] Typecheck and lint clean on touched files
-- [ ] New unit tests pass, old ones still pass
+- [ ] The shipped tests the host's seams allow copied unchanged; new and old tests pass
 - [ ] Pack printed and read; size compared with the baseline
 - [ ] Render check passed for every moved section
 - [ ] Every probe passes, old and new, or is listed as not run with the reason

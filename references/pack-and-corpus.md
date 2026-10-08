@@ -118,9 +118,12 @@ export function programDocument(): KnowledgeDocument {
 }
 ```
 
-Register both in the corpus builder next to the existing kinds, then check the search scorer weights
-title, tags and summary above body hits. A typical scorer: title 8, tags 5, summary 3, body occurrences
-capped at 10, the total multiplied by 1.5 when every query token matched.
+Register both in the corpus builder next to the existing kinds. The search scorer stays the host's: the
+tags are the lever, and this change does not rewrite ranking. If the program search test in
+[verification.md](verification.md) still fails with the tags in place, say in the handover that the scorer
+ranks body hits as high as titles and tags, and leave the change to its own decision. For reference, a
+scorer that ranks well: title 8, tags 5, summary 3, body occurrences capped at 10, the total multiplied by
+1.5 when every query token matched.
 
 ## The pack section
 
@@ -158,6 +161,10 @@ export function siteMapLines(articles: readonly Article[], categories: readonly 
   ].join("\n");
 }
 ```
+
+A host with no sitemap source (no `app/sitemap.ts`, no route arrays) has nothing to derive from: add the
+new page and its form as lines in the site map the pack already has, and name the sitemap seam absent in the
+handover. A routes module made up for the occasion is a second hand-kept list with a more official name.
 
 When the router maps content slugs to different routes (the slug `consulting` served at
 `/services/consulting`), derive that map from the same data array too; a hand-kept `Record<slug, route>` is the next

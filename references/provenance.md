@@ -7,7 +7,7 @@ anything you change.
 
 The earlier implementation was the assistant of a marketing site, answering on more than one channel from
 one knowledge module. The update this skill is written from taught it a new catalog with a page per entry, a
-partner program page and a reworked sitemap. Nine entries below were fixed, four kept, and seven added.
+partner program page and a reworked sitemap. Nine entries below were fixed, four kept, and ten added.
 
 ## Fixed
 
@@ -79,6 +79,14 @@ name in the prompt. Found while writing this skill. **Now:** the "print the pack
 - The vitest config for a host with no test runner; the earlier implementation ran its tests under bun.
 - The rule for a run with no reachable model: probes written, reported as not run, never as passing.
 - The build-output variant of the render check for a host where no dev server can be started.
+- No commits on an unattended run: the handover lists the refactor's files and the knowledge change's files,
+  in that order, for the operator to commit. Found by the 0.1.0 agent eval, where a run that made the two
+  commits under an identity not the operator's left nothing uncommitted for the harness to measure.
+- The absent-seam clauses: a host with no sitemap source gets lines in the pack's existing site map, and a
+  host with no transport gets the throwing `ask` stub in `scripts/ask.mjs`. Found by the 0.1.0 agent eval,
+  where runs invented a routes module, an endpoint and its environment variables.
+- Which shipped tests a host copies: those whose seams it has, assertions unchanged, 2 of the 4 without a
+  catalog. Found by the 0.1.0 agent eval, where every run replaced the suite with tests of its own.
 
 ## If you are applying this to an existing assistant
 

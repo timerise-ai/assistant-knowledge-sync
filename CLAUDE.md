@@ -18,7 +18,7 @@ script in `verification.md` all run in the host.
 The skill was written by the engineer who has shipped this work; the earlier implementation it was audited
 against was the assistant of a marketing site answering on more than one channel from one knowledge module.
 `references/provenance.md` is the rationale layer: nine entries fixed, four kept deliberately with the reason
-each is safe, seven added in the skill and never run on a second host. Read it before "simplifying"
+each is safe, ten added in the skill and never run on a second host. Read it before "simplifying"
 anything.
 
 ## Structure
@@ -63,7 +63,7 @@ anything.
   npm i -D typescript @types/react @types/node vitest
   npx tsc --noEmit     # strict, noUncheckedIndexedAccess, skipLibCheck, jsx react-jsx, paths {"@/*": ["./*"]}
   npx vitest run       # the 4 tests in verification.md
-  node --check scripts/probe.mjs
+  node --check scripts/probe.mjs && node --check scripts/ask.mjs
   ```
 
   The three files carried in `evals/prompts.md` prompt 1 must also compile under the fixture's `strict`.
