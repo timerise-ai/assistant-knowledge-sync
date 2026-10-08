@@ -146,3 +146,15 @@ isolated: true
 timedOut: false
 runUrl: https://github.com/timerise-ai/assistant-knowledge-sync/actions/runs/37785035114
 ---
+
+Rubric 5/8, scored from the JSON summary. The copy moved verbatim, the guardrails use the template wording
+with a probe rejecting any percentage, the routing line sends partners to `/partners/apply`, the site map
+gained one line in the existing pack, and the probe script imports `ask` from a separate `scripts/ask.mjs` as
+the template does, reported not run with its command. Item 2: it rewrote the host's search scorer to weight
+title, tags and summary, reading "check the search scorer weights title, tags and summary above body hits"
+as an instruction, though the same reference says the host keeps its scorer; and it created `data/program.ts`
+as an alias of `data/partners.ts` "to support canonical skill references", reading the seam table's canonical
+path as a file to create. Item 3: seven tests of its own rather than the shipped ones, for the same reason as
+the other two runs. Item 8: neither the pack size before and after nor the absent seams (no sitemap source, no
+tools module) are reported. Commits are not mentioned; three shell commands were denied by policy, so whether
+it tried to commit is unknown.

@@ -146,3 +146,15 @@ isolated: true
 timedOut: false
 runUrl: https://github.com/timerise-ai/assistant-knowledge-sync/actions/runs/37785035114
 ---
+
+Rubric 4/8, scored from the JSON summary. The work itself is close to the procedure: the copy moved word for
+word into `data/partners.ts` with identical built HTML, the corpus document and pack section read from it,
+the payout line bans any percentage or amount, partners are routed to `/partners/apply`, and the search
+description names `/partners`. Item 1 fails because it committed: following quick-start step 7 ("commit the
+refactor and the knowledge change as two commits") it made three commits on a new branch under the
+fixture's `eval` identity, so the harness, which measures the uncommitted diff, saw zero files changed. The
+skill says nothing about committing on an unattended run with no git identity. Item 3: five tests of its
+own, not the shipped ones; the skill documents four, two of which need a catalog the host does not have,
+and never says which apply. Item 6: the transport was written inline as `ask()` in `scripts/probe.mjs` with an
+invented `ASSISTANT_URL`; the skill says `ask` is the host's and is silent when the host has none. Item 8: the
+pack's size before and after is not reported (hard rule 5).
