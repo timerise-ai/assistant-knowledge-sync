@@ -114,7 +114,8 @@ never as passing; every other layer still runs (see [verification.md](references
   the operator commits them, in that order, from the file lists in the handover.
 - **A seam the host lacks stays absent.** No sitemap source: add the route to the site map the pack already
   has. No transport to the assistant: `scripts/ask.mjs` throws until it is wired. Never invent a routes
-  module, an endpoint or an environment variable, and never copy a host file to a canonical path.
+  module, an endpoint or an environment variable, and never copy a host file to a canonical path. The docs
+  line is the exception: a host without one gets it, as a line in its `README.md`.
 - **Copy the shipped tests whose seams the host has**, assertions unchanged: with no catalog, the program
   and pack tests, 2 of the 4. Extra tests go beside them. The host's search scorer stays; tags are the lever.
 - **Hand over**: each probe as written and not run, with its command; the absent seams; the pack's size
@@ -133,8 +134,8 @@ never as passing; every other layer still runs (see [verification.md](references
    channel: [guardrails.md](references/guardrails.md).
 6. **Verify**: typecheck, lint, unit tests, pack dump, render check, live probes:
    [verification.md](references/verification.md).
-7. **Update the project docs line** that says what the assistant knows, then commit the refactor and
-   the knowledge change as two commits (unattended: list them in the handover instead).
+7. **Update the project docs line** that says what the assistant knows (add it when there is none), then
+   commit the refactor and the knowledge change as two commits (unattended: list them in the handover).
 
 ## Reference directory
 

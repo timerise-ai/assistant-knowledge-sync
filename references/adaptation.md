@@ -27,7 +27,7 @@ non-negotiables. Fill the seam table before editing anything; every other refere
 | Data modules | `data/*` | `data/program.ts` | plain-text arrays that pages import |
 | Probe script | `probe` | `scripts/probe.mjs` | the script that asks the running assistant questions |
 | Unit tests | `knowledge.test` | `lib/ai/knowledge.test.ts` | tests next to the knowledge module |
-| Project docs line | `docs` | | the line in `CLAUDE.md` or `README.md` that lists what the assistant knows |
+| Project docs line | `docs` | | the line in `CLAUDE.md` or `README.md` that lists what the assistant knows; never absent, added to `README.md` when missing |
 
 Mark a seam the host does not have as absent; never invent a file to fill the column. A host with no probe
 script gets one, and a host with no transport to the assistant gets the `ask` stub, both from
@@ -82,7 +82,7 @@ makes the two commits from the handover's file lists; the agent commits nothing 
 4. Extend corpus, pack, site map and live index ([pack-and-corpus.md](pack-and-corpus.md)).
 5. Write the guardrails on every channel ([guardrails.md](guardrails.md)).
 6. Verify, then commit the knowledge change ([verification.md](verification.md)).
-7. Update the `docs` line.
+7. Update the `docs` line, or add it to `README.md` when the host has none.
 
 ## The non-negotiables
 
