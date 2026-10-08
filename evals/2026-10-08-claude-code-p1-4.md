@@ -146,3 +146,10 @@ isolated: true
 timedOut: false
 runUrl: https://github.com/timerise-ai/assistant-knowledge-sync/actions/runs/37833844108
 ---
+
+Rubric 8/8, scored from the JSON summary. Copy moved word for word into `data/partners.ts` and the built page
+shows every section; it declined to add page metadata the page never had. The scorer is unchanged, the two
+applicable shipped tests are copied unchanged beside five of its own, `scripts/ask.mjs` is the throwing stub,
+the routes went into the existing site map, and the pack carries the never-quote and routing lines. The
+handover names the five probes as not run with `npm run probe`, the absent seams, the pack at 88 to 723
+characters, the README line it added, and the two commits' files; nothing committed, no branch.
