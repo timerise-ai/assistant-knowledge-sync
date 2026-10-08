@@ -5,9 +5,14 @@ reach. The **pack** is a compact text appended to the system prompt on every tur
 needs both: a corpus document for detail, and a short pack section plus a site map line so the
 assistant knows the page exists without searching.
 
+The blocks below extend the host's knowledge module, `lib/ai/knowledge.ts` in the seam table of
+[adaptation.md](adaptation.md). They add types and builders; the host keeps its own corpus registry, search
+scorer and pack assembly, and calls these from there.
+
 ## The document shape
 
 ```ts
+// lib/ai/knowledge.ts
 export type KnowledgeKind = "help" | "blog" | "case-study" | "catalog" | "page";
 
 export interface KnowledgeDocument {
@@ -26,36 +31,36 @@ export interface KnowledgeDocument {
 
 | Kind | One per | Content built from |
 |---|---|---|
-| `catalog` | catalog entry page (`/catalog/<slug>`) | the same parsed object the page renders: problem, when to use, rules, requirements, install line, offer, test results, releases |
+| `catalog` | catalog entry page (`/catalog/<slug>`) | the same parsed object the page renders: problem, when to use, requirements, what is included, offer, release |
 | `page` | standalone page with real substance (a program, a pricing page) | the page's data module, section by section in reading order |
 
-Tags are the cheapest ranking lever. A program page whose title is its brand name ("Example Builders")
+Tags are the cheapest ranking lever. A program page whose title is its brand name ("Example Partners")
 will lose to a blog post for the query "partner program referrer" unless those words are tags.
 
 ## Building catalog and page documents
 
 ```ts
-interface CatalogEntry {
+export interface CatalogEntry {
   slug: string;
   name: string;
-  repoUrl: string;
+  sourceUrl: string;
   category: string;
-  /** `tool` entries are used by an agent on something else; there is nothing to sell. */
-  kind: "module" | "tool";
+  /** `free` entries are free resources; there is nothing to build or quote. */
+  kind: "offer" | "free";
   tagline: string;
   problem: string;
   whenToUse: string[];
   requirements: string[];
+  includes: string[];
   version: string | null;
   priceFrom: number | null;
   currency: string;
   days: number | null;
-  results: Array<{ agent: string; result: "pass" | "partial" | "fail" }>;
 }
 
 /** The offer exactly as the page states it; never a number the page does not show. */
 export function catalogOffer(entry: CatalogEntry): string {
-  if (entry.kind === "tool") return "A tool, not a module: nothing to build or quote.";
+  if (entry.kind === "free") return "A free resource: nothing to build or quote.";
   if (entry.priceFrom === null) return "Built on a brief; the price comes from the brief.";
   const days = entry.days ? `, about ${entry.days} working days` : "";
   return `From ${entry.priceFrom.toLocaleString("en-US")} ${entry.currency}${days}.`;
@@ -71,16 +76,13 @@ export function catalogDocument(entry: CatalogEntry): KnowledgeDocument {
     summary: entry.tagline,
     tags: ["catalog", entry.slug, entry.category, entry.kind],
     content: [
-      `Source: ${entry.repoUrl}. Category: ${entry.category}.`,
+      `Source: ${entry.sourceUrl}. Category: ${entry.category}.`,
       entry.version ? `Latest release: v${entry.version}.` : "",
       catalogOffer(entry),
       entry.problem,
       block("When to use:", entry.whenToUse),
       block("Requirements:", entry.requirements),
-      block(
-        "Test results:",
-        entry.results.map((r) => `${r.agent}: ${r.result}`),
-      ),
+      block("Includes:", entry.includes),
     ]
       .filter(Boolean)
       .join("\n\n"),
@@ -91,10 +93,11 @@ export function catalogDocument(entry: CatalogEntry): KnowledgeDocument {
 Name the local helper `block`, not `section`: knowledge modules usually already have a `section()`
 that reads i18n copy, and shadowing it compiles but confuses the next reader.
 
-The program page document reads the data module from [single-source.md](single-source.md):
+The program page document reads the data module from [single-source.md](single-source.md). Its import
+goes at the top of the file with the others:
 
 ```ts
-import { PROGRAM_FAQ, PROGRAM_NAME, PROGRAM_PROMISES, PROGRAM_ROLES } from "@/data/program";
+import { PROGRAM_FAQ, PROGRAM_META, PROGRAM_NAME, PROGRAM_PROMISES, PROGRAM_ROLES } from "@/data/program";
 
 export function programDocument(): KnowledgeDocument {
   const stages = PROGRAM_ROLES.flatMap((role) =>
@@ -103,8 +106,8 @@ export function programDocument(): KnowledgeDocument {
   return {
     kind: "page",
     title: PROGRAM_NAME,
-    url: "/program",
-    summary: `${PROGRAM_NAME} is our partner program.`,
+    url: "/partners",
+    summary: PROGRAM_META.description,
     tags: ["partner program", "partners", ...PROGRAM_ROLES.flatMap((r) => r.stages.map((s) => s.name))],
     content: [
       PROGRAM_PROMISES.map((p) => `- ${p.title}: ${p.body}`).join("\n"),
@@ -117,7 +120,7 @@ export function programDocument(): KnowledgeDocument {
 
 Register both in the corpus builder next to the existing kinds, then check the search scorer weights
 title, tags and summary above body hits. A typical scorer: title 8, tags 5, summary 3, body occurrences
-capped at 10, ×1.5 when every query token matched.
+capped at 10, the total multiplied by 1.5 when every query token matched.
 
 ## The pack section
 
@@ -126,11 +129,11 @@ Short: what it is, the destinations, the guardrails. Detail stays in the corpus 
 ```ts
 export function programLines(): string {
   return [
-    `- ${PROGRAM_NAME}: our partner program. Page: /program; form: /program/apply.`,
+    `- ${PROGRAM_NAME}: our partner program. Page: /partners; form: /partners/apply.`,
     `- ${PROGRAM_PROMISES.map((p) => `${p.title}: ${p.body}`).join(" ")}`,
     `- Not published yet: the payout shares. Never quote a percentage or an amount.`,
-    `- Someone who wants to join goes to /program/apply, not to the sales brief.`,
-    `- Full page text: read "/program".`,
+    `- Someone who wants to join goes to /partners/apply, not to the sales brief.`,
+    `- Full page text: read "/partners".`,
   ].join("\n");
 }
 ```
@@ -141,20 +144,24 @@ Never maintain a second list of routes. Import the arrays the sitemap maps over 
 catalog categories) and write one line per destination, with what a visitor finds there.
 
 ```ts
-interface Article { slug: string; href: string }
+export interface Article {
+  slug: string;
+  href: string;
+}
 
 export function siteMapLines(articles: readonly Article[], categories: readonly string[]): string {
   return [
     `- Catalog (search and a category filter: ${categories.join(", ")}): /catalog; one page per entry at /catalog/<slug>`,
-    `- Partner program: /program, apply at /program/apply`,
+    `- Partner program: /partners, apply at /partners/apply`,
     `- Articles: ${articles.map((a) => a.href).join(", ")}`,
     `- Legal: ${["/privacy", "/terms"].join(", ")}`,
   ].join("\n");
 }
 ```
 
-When the router maps content slugs to different routes (`ai-delivery` → `/ai-systems`), derive that
-map from the same data array too; a hand-kept `Record<slug, route>` is the next drift.
+When the router maps content slugs to different routes (the slug `consulting` served at
+`/services/consulting`), derive that map from the same data array too; a hand-kept `Record<slug, route>` is the next
+drift.
 
 ## Joining a live index with local facts
 
@@ -163,7 +170,12 @@ what exists, and the local files know what the page shows. Join them and let the
 renders.
 
 ```ts
-interface IndexRow { name: string; url: string; version?: string; builds: string }
+export interface IndexRow {
+  name: string;
+  url: string;
+  version?: string;
+  summary: string;
+}
 
 export function joinedRows(index: IndexRow[], local: Map<string, CatalogEntry>): string {
   return index
@@ -173,7 +185,7 @@ export function joinedRows(index: IndexRow[], local: Map<string, CatalogEntry>):
       const version = page?.version ?? row.version;
       const facts = page ? ` [${page.category}; page: /catalog/${page.slug}]` : "";
       const offer = page ? ` ${catalogOffer(page)}` : "";
-      return `- **${row.name}**${version ? ` v${version}` : ""} (${row.url})${facts}: ${row.builds}.${offer}`;
+      return `- **${row.name}**${version ? ` v${version}` : ""} (${row.url})${facts}: ${row.summary}.${offer}`;
     })
     .join("\n");
 }
@@ -185,8 +197,8 @@ Rows the index lists but the site has no page for stay in (they exist), without 
 
 | Budget | Guidance |
 |---|---|
-| Pack | Measure before and after. Indexes are one line per item; growth beyond ~20% for one feature means detail belongs in the corpus |
-| Corpus document | Capped by the read tool (e.g. 14,000 characters, with a truncation marker) |
+| Pack | Measure before and after. Indexes are one line per item; growth beyond about 20% for one feature means detail belongs in the corpus |
+| Corpus document | Capped by the read tool (for example 14,000 characters, with a truncation marker) |
 | Memoization | Corpus and pack are cached per locale for the life of the server instance; content ships with deploys, so no invalidation is needed |
 | Live index | Cached in memory for about an hour, with a fetch timeout of a few seconds and a static fallback |
 
@@ -196,5 +208,5 @@ Rows the index lists but the site has no page for stay in (they exist), without 
 - [ ] Tags include the words visitors use, not only the brand name
 - [ ] Pack section is short and points to the corpus document
 - [ ] Site map built from the sitemap's arrays; every new route present
-- [ ] Live index joined with local facts; page version wins
+- [ ] Live index joined with local facts; the page's version wins
 - [ ] Pack size measured; growth justified

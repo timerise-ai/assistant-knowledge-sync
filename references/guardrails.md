@@ -11,11 +11,11 @@ live in the prompt module (surface 6) or in the pack section next to the facts t
 | **Unpublished** | Invented numbers, dates, names | "Not published yet: `<what>` (published `<when>`). Never quote a percentage or an amount." |
 | **Routing** | The right answer with the wrong next step | "Someone who wants to `<intent>` goes to `<route>`, not to `<other route>`. Someone who wants `<other intent>` goes to `<other route>`." |
 | **Kind distinction** | Selling what is not for sale | "Entries marked `<marker>` are `<what they are>`; there is nothing to build or quote, so never send them to `<sales route>`." |
-| **Link preference** | Sending visitors off-site when a page exists | "Link `<thing>` to its page, e.g. `[Name](/catalog/slug)`; link the source repository only as the source." |
+| **Link preference** | Sending visitors off-site when a page exists | "Link `<thing>` to its page, for example `[Name](/catalog/slug)`; link the code repository only as where the code lives." |
 | **Scope** | "I can't help with that" for a page the site has | Add the new topic and its route to the allowed-topics list |
 
 Write guardrails as instructions with the exact route, not as descriptions. "Partners apply at
-/program/apply" is a fact; "Someone who wants to join goes to /program/apply, not to the brief" is a
+/partners/apply" is a fact; "Someone who wants to join goes to /partners/apply, not to the brief" is a
 guardrail the model follows.
 
 ## Tool descriptions
@@ -24,15 +24,16 @@ The model decides whether to search from the tool's description, not from what t
 Whenever a document kind is added, update both:
 
 ```ts
-const searchDescription =
+// lib/ai/tools.ts
+export const searchDescription =
   "Full-text search across the help center, blog, case studies, catalog entry pages and the partner program page. Use it before answering any how-to, feature, catalog or program question.";
 
-const readDescription =
-  "Reads the full text of one document by its site path (for example /help/<category>/<slug>, /blog/<slug>, /catalog/<slug> or /program). Use after search when you need exact steps or details.";
+export const readDescription =
+  "Reads the full text of one document by its site path (for example /help/<category>/<slug>, /blog/<slug>, /catalog/<slug> or /partners). Use after search when you need exact steps or details.";
 ```
 
 Also add a grounding line naming when to read the new kind directly: "For what a catalog entry
-requires, its rules or its test results, read its page (/catalog/<slug>) and answer from it."
+requires, includes or costs, read its page (/catalog/<slug>) and answer from it."
 
 ## Every channel
 
@@ -41,10 +42,10 @@ from [surfaces.md](surfaces.md):
 
 | Channel | What changes for a new destination |
 |---|---|
-| Web widget | Relative links: `[Program](/program)` |
+| Web widget | Relative links: `[Partners](/partners)` |
 | Chat app (Discord, Slack) | Absolute links on the site URL; length cap; never ask for contact details in a shared channel. Name the new audience if the community is part of it ("candidates for the partner program") |
 | Agent protocol (MCP) | Absolute links; where the web says "go to the form", say which tool does it, if one exists |
-| Interview / brief prompt | Usually inherits the pack; check it does not route program candidates into the sales interview |
+| Interview or brief prompt | Usually inherits the pack; check it does not route program candidates into the sales interview |
 
 ## Wording rules for guardrails
 
@@ -60,5 +61,5 @@ from [surfaces.md](surfaces.md):
 - [ ] Kind distinctions written for entries that are not for sale
 - [ ] Link rules prefer the site's own page
 - [ ] Allowed topics include the new topic
-- [ ] Search and read tool descriptions name the new kind and example path
+- [ ] Search and read tool descriptions name the new kind and an example path
 - [ ] Every channel checked
