@@ -4,6 +4,16 @@ All notable changes to this skill are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] - 2026-10-08
+
+Fix release, from scoring the second round of prompt-1 agent eval runs against 0.1.1.
+
+### Changed
+
+- The project docs line is never an absent seam: a host without one gets it as a line in `README.md`
+  (`SKILL.md` *Working unattended* and quick-start step 7, the seam table and order of work in
+  `adaptation.md`).
+
 ## [0.1.1] - 2026-10-08
 
 Fix release, from scoring the prompt-1 agent eval runs against 0.1.0.
